@@ -35,3 +35,68 @@ class Stack:
         while n:
             yield n.val
             n = n.next
+
+ 
+            
+#paired delimiter matching
+delim_openers = '{([<'
+delim_closers = '})]>'
+
+def check_delimiters(expr):
+    """Returns True if and only if `expr` contains only correctly matched delimiters, else returns False."""
+   
+    delim = Stack()
+    for x in expr:
+        try:
+            i = delim_openers.index(x)
+            delim.push(i)
+            continue
+        except ValueError:
+            pass
+        try:
+            i = delim_closers.index(x)
+            if not delim:
+                return False
+            j = delim.pop()
+            if j != i:
+                return False
+            continue
+        except ValueError:
+            pass
+    return delim.empty()
+
+
+#infix - postfix conversion
+# you may find the following precedence dictionary useful
+prec = {'*': 2, '/': 2,
+        '+': 1, '-': 1}
+
+def infix_to_postfix(expr):
+    """Returns the postfix form of the infix expression found in `expr`"""
+    ops = Stack()
+    postfix = []
+    toks = expr.split()
+     
+    for t in toks:
+        if t.isdigit():
+            postfix.append(t)
+        elif t == '(':
+            ops.push(t)
+        elif t == ')':
+            op = ops.pop()
+            while op != '(':
+                postfix.append(op)
+                op = ops.pop()
+        else:
+            while True:
+                if ops.empty() or ops.peek() == '(':
+                    ops.push(t)
+                    break
+                if prec[t] > prec[ops.peek()]:
+                    ops.push(t)
+                    break
+                else:
+                    postfix.append(ops.pop())
+    while not ops.empty():
+        postfix.append(ops.pop())
+    return ' '.join(postfix)
